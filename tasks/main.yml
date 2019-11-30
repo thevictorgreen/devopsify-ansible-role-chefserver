@@ -4,3 +4,31 @@
   become: yes
   apt:
     update_cache: yes
+
+- name: Create chefserver automation directory
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - '/root/.chef_automate'
+    - '/root/.chef'
+
+- name: Create chef_init.sh File
+  become: yes
+  copy:
+    src: chef_init.sh
+    dest: /root/.chef_automate/chef_init.sh
+
+- name: Change permissions on chef_init.sh
+  become: yes
+  file:
+    path: /root/.chef_automate/chef_init.sh
+    mode: "u+rwx"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Run Chef Server Initialization script
+  become: yes
+  command: /root/.chef_automate/chef_init.sh
+  args:
+    executable: /bin/bash
